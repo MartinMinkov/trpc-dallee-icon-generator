@@ -1,11 +1,13 @@
 import { type NextPage } from "next";
+import { useState } from "react";
+import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { z } from "zod";
 import { api } from "~/utils/api";
 
 import { Input } from "~/components/Input";
+import { Button } from "~/components/Button";
 import { FormGroup } from "~/components/FormGroup";
-import { useState } from "react";
 
 const validationSchema = z.object({
   prompt: z.string().nonempty(),
@@ -36,6 +38,9 @@ const GeneratePage: NextPage = () => {
     };
   };
 
+  const session = useSession();
+  const isLoggedIn = session.status === "authenticated";
+
   return (
     <>
       <Head>
@@ -44,6 +49,25 @@ const GeneratePage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center">
+        {!isLoggedIn ? (
+          <Button
+            onClick={() => {
+              signIn().catch(console.error);
+            }}
+            className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
+          >
+            Login
+          </Button>
+        ) : (
+          <Button
+            onClick={() => {
+              signOut().catch(console.error);
+            }}
+            className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
+          >
+            Logout
+          </Button>
+        )}
         <form className="flex flex-col gap-4" onSubmit={onSubmit}>
           <FormGroup>
             <label htmlFor="prompt">Prompt</label>
@@ -54,9 +78,9 @@ const GeneratePage: NextPage = () => {
               onChange={updateForm("prompt")}
             />
           </FormGroup>
-          <button className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500">
+          <Button className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500">
             Generate
-          </button>
+          </Button>
         </form>
       </main>
     </>
