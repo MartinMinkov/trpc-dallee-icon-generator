@@ -8,9 +8,13 @@ import { api } from "~/utils/api";
 import { Input } from "~/components/Input";
 import { Button } from "~/components/Button";
 import { FormGroup } from "~/components/FormGroup";
+import Image from "next/image";
 
 const validationSchema = z.object({
   prompt: z.string().nonempty(),
+  errors: z.object({
+    prompt: z.string().optional(),
+  }),
 });
 
 type ValidationSchema = z.infer<typeof validationSchema>;
@@ -18,28 +22,81 @@ type ValidationSchema = z.infer<typeof validationSchema>;
 const GeneratePage: NextPage = () => {
   const [form, setForm] = useState<ValidationSchema>({
     prompt: "",
+    errors: {
+      prompt: undefined,
+    },
   });
+  const [imageUrl, setImageUrl] = useState<string>("");
+
+  const session = useSession();
+  const isLoggedIn = session.status === "authenticated";
 
   const generateIcon = api.generate.generateIcon.useMutation({
     onSuccess: (data) => {
-      console.log("mutation finished", data);
+      setImageUrl(data.b64_json);
     },
   });
 
+  const handleError = (error: unknown) => {
+    if (error instanceof z.ZodError) {
+      for (const issue of error.issues) {
+        const { path } = issue;
+        if (path.length === 0) continue;
+        if (path[0] === "prompt") {
+          setForm((prev) => ({
+            ...prev,
+            errors: {
+              ...prev.errors,
+              prompt: "Prompt is required",
+            },
+          }));
+        }
+      }
+    }
+  };
+
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    const data = validationSchema.parse(form);
-    generateIcon.mutate(data);
+    try {
+      const data = validationSchema.parse(form);
+      generateIcon.mutate(data);
+      setImageUrl("");
+      setForm({ prompt: "", errors: {} });
+    } catch (error) {
+      handleError(error);
+    }
   };
 
   const updateForm = (key: string) => {
     return function (e: React.ChangeEvent<HTMLInputElement>) {
-      setForm((prev) => ({ ...prev, [key]: e.target.value }));
+      const errors = { ...form.errors, [key]: undefined };
+      setForm((prev) => {
+        return { ...prev, errors, [key]: e.target.value };
+      });
     };
   };
 
-  const session = useSession();
-  const isLoggedIn = session.status === "authenticated";
+  const renderAuthenticationButtons = () => {
+    return !isLoggedIn ? (
+      <Button
+        onClick={() => {
+          signIn().catch(console.error);
+        }}
+        className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
+      >
+        Login
+      </Button>
+    ) : (
+      <Button
+        onClick={() => {
+          signOut().catch(console.error);
+        }}
+        className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
+      >
+        Logout
+      </Button>
+    );
+  };
 
   return (
     <>
@@ -49,25 +106,7 @@ const GeneratePage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center">
-        {!isLoggedIn ? (
-          <Button
-            onClick={() => {
-              signIn().catch(console.error);
-            }}
-            className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
-          >
-            Login
-          </Button>
-        ) : (
-          <Button
-            onClick={() => {
-              signOut().catch(console.error);
-            }}
-            className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
-          >
-            Logout
-          </Button>
-        )}
+        {renderAuthenticationButtons()}
         <form className="flex flex-col gap-4" onSubmit={onSubmit}>
           <FormGroup>
             <label htmlFor="prompt">Prompt</label>
@@ -77,11 +116,22 @@ const GeneratePage: NextPage = () => {
               placeholder="Write your prompt here..."
               onChange={updateForm("prompt")}
             />
+            {form.errors.prompt && (
+              <p className="italic text-red-500">{form.errors.prompt}</p>
+            )}
           </FormGroup>
           <Button className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500">
             Generate
           </Button>
         </form>
+        {imageUrl && (
+          <img
+            src={`data:image/png;base64, ${imageUrl}`}
+            alt="Image of generated prompt"
+            width={100}
+            height={100}
+          />
+        )}
       </main>
     </>
   );

@@ -21,6 +21,15 @@ const server = z.object({
   // Add `.min(1) on ID and SECRET if you want to make sure they're not empty
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
+  DALLEE_API_KEY: z.string().min(1),
+  MOCK_DALLEE: z
+    .string()
+    .min(1)
+    .transform((val) => val === "true"),
+  AWS_ACCESS_KEY_ID: z.string().min(1),
+  AWS_SECRET_ACCESS_KEY: z.string().min(1),
+  AWS_REGION: z.string().min(1),
+  AWS_BUCKET_NAME: z.string().min(1),
 });
 
 /**
@@ -44,6 +53,13 @@ const processEnv = {
   NEXTAUTH_URL: process.env.NEXTAUTH_URL,
   GOOGLE_CLIENT_ID: process.env.GOOGLE_CLIENT_ID,
   GOOGLE_CLIENT_SECRET: process.env.GOOGLE_CLIENT_SECRET,
+  DALLEE_API_KEY: process.env.DALLEE_API_KEY,
+  MOCK_DALLEE: process.env.MOCK_DALLEE,
+  AWS_ACCESS_KEY_ID: process.env.AWS_ACCESS_KEY_ID,
+  AWS_SECRET_ACCESS_KEY: process.env.AWS_SECRET_ACCESS_KEY,
+  AWS_REGION: process.env.AWS_REGION,
+  AWS_BUCKET_NAME: process.env.AWS_BUCKET_NAME,
+
   // NEXT_PUBLIC_CLIENTVAR: process.env.NEXT_PUBLIC_CLIENTVAR,
 };
 
