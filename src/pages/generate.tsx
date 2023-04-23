@@ -3,12 +3,13 @@ import { useState } from "react";
 import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { z } from "zod";
-import { api } from "~/utils/api";
+import Image from "next/image";
 
+import { api } from "~/utils/api";
+import { useBuyCredits } from "~/hooks/useBuyCredits";
 import { Input } from "~/components/Input";
 import { Button } from "~/components/Button";
 import { FormGroup } from "~/components/FormGroup";
-import Image from "next/image";
 import { TRPCClientError } from "@trpc/client";
 
 const validationSchema = z.object({
@@ -33,6 +34,7 @@ const GeneratePage: NextPage = () => {
 
   const session = useSession();
   const isLoggedIn = session.status === "authenticated";
+  const { buyCredits } = useBuyCredits();
 
   const generateIcon = api.generate.generateIcon.useMutation({
     onSuccess: (data) => {
@@ -103,14 +105,24 @@ const GeneratePage: NextPage = () => {
         Login
       </Button>
     ) : (
-      <Button
-        onClick={() => {
-          signOut().catch(console.error);
-        }}
-        className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
-      >
-        Logout
-      </Button>
+      <>
+        <Button
+          onClick={() => {
+            signOut().catch(console.error);
+          }}
+          className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
+        >
+          Logout
+        </Button>
+        <Button
+          onClick={() => {
+            buyCredits().catch(console.error);
+          }}
+          className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
+        >
+          Buy Credits
+        </Button>
+      </>
     );
   };
 
