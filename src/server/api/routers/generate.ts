@@ -2,11 +2,20 @@ import { TRPCError } from "@trpc/server";
 import { z } from "zod";
 import { Configuration, OpenAIApi } from "openai";
 import AWS from "aws-sdk";
+import { nanoid } from "nanoid";
 
 import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { env } from "~/env.mjs";
-import { base64Image } from "~/data/b64Image";
-import { PrismaClient } from "@prisma/client";
+import { imageMockUrl } from "~/data/imageMock";
+import { type PrismaClient } from "@prisma/client";
+
+type GenerateIconResponse = {
+  b64_json: string;
+};
+
+type GenerateResponse = {
+  imageUrl: string;
+};
 
 const configuration = new Configuration({
   apiKey: env.DALLEE_API_KEY,
@@ -20,9 +29,6 @@ const s3 = new AWS.S3({
   region: env.AWS_REGION,
 });
 
-type GenerateIconResponse = {
-  b64_json: string;
-};
 async function generateIcon(prompt: string) {
   const openai = new OpenAIApi(configuration);
   let errorMessage: string | null = null;
@@ -53,12 +59,13 @@ async function generateIcon(prompt: string) {
 }
 
 async function saveIconToDatabase(
-  prompt: string,
+  data: { prompt: string; imageUrl: string },
   ctx: { prisma: PrismaClient; session: { user: { id: string } } }
 ) {
   return ctx.prisma.icon.create({
     data: {
-      prompt,
+      prompt: data.prompt,
+      url: data.imageUrl,
       userId: ctx.session.user.id,
     },
   });
@@ -79,15 +86,17 @@ async function uploadIconToS3(
     .promise();
 }
 
+function generateIconUrl(iconId: string) {
+  return `https://${env.AWS_BUCKET_NAME}.s3.${env.AWS_REGION}.amazonaws.com/${iconId}`;
+}
+
 export const generateRouter = createTRPCRouter({
   generateIcon: protectedProcedure
     .input(z.object({ prompt: z.string() }))
     .mutation(async ({ ctx, input }) => {
       // Return mock response if in development
       if (env.MOCK_DALLEE) {
-        return {
-          b64_json: base64Image,
-        } as GenerateIconResponse;
+        return { imageUrl: imageMockUrl } as GenerateResponse;
       }
 
       const { count } = await ctx.prisma.user.updateMany({
@@ -110,10 +119,11 @@ export const generateRouter = createTRPCRouter({
         });
       }
 
+      const iconId = nanoid();
       const base64EncodedImage = await generateIcon(input.prompt);
-      const icon = await saveIconToDatabase(input.prompt, ctx);
-      console.log(icon);
-      await uploadIconToS3(base64EncodedImage, icon.id);
-      return base64EncodedImage;
+      const imageUrl = generateIconUrl(iconId);
+      await saveIconToDatabase({ prompt: input.prompt, imageUrl }, ctx);
+      await uploadIconToS3(base64EncodedImage, iconId);
+      return { imageUrl } as GenerateResponse;
     }),
 });

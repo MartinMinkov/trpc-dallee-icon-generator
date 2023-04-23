@@ -9,11 +9,13 @@ import { Input } from "~/components/Input";
 import { Button } from "~/components/Button";
 import { FormGroup } from "~/components/FormGroup";
 import Image from "next/image";
+import { TRPCClientError } from "@trpc/client";
 
 const validationSchema = z.object({
   prompt: z.string().nonempty(),
   errors: z.object({
     prompt: z.string().optional(),
+    authorized: z.string().optional(),
   }),
 });
 
@@ -24,6 +26,7 @@ const GeneratePage: NextPage = () => {
     prompt: "",
     errors: {
       prompt: undefined,
+      authorized: undefined,
     },
   });
   const [imageUrl, setImageUrl] = useState<string>("");
@@ -33,23 +36,36 @@ const GeneratePage: NextPage = () => {
 
   const generateIcon = api.generate.generateIcon.useMutation({
     onSuccess: (data) => {
-      setImageUrl(data.b64_json);
+      setImageUrl(data.imageUrl);
+    },
+    onError: (error) => {
+      if (error instanceof TRPCClientError) {
+        if (error.message === "UNAUTHORIZED") {
+          setForm((currentState) => {
+            const newErrors = {
+              ...currentState.errors,
+              authorized: "Must be logged in to generate icons",
+            };
+            return { ...currentState, errors: newErrors };
+          });
+        }
+      }
     },
   });
 
-  const handleError = (error: unknown) => {
+  const handleFormErrors = (error: unknown) => {
     if (error instanceof z.ZodError) {
       for (const issue of error.issues) {
         const { path } = issue;
         if (path.length === 0) continue;
         if (path[0] === "prompt") {
-          setForm((prev) => ({
-            ...prev,
-            errors: {
-              ...prev.errors,
+          setForm((currentState) => {
+            const newErrors = {
+              ...currentState.errors,
               prompt: "Prompt is required",
-            },
-          }));
+            };
+            return { ...currentState, errors: newErrors };
+          });
         }
       }
     }
@@ -63,7 +79,7 @@ const GeneratePage: NextPage = () => {
       setImageUrl("");
       setForm({ prompt: "", errors: {} });
     } catch (error) {
-      handleError(error);
+      handleFormErrors(error);
     }
   };
 
@@ -123,10 +139,13 @@ const GeneratePage: NextPage = () => {
           <Button className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500">
             Generate
           </Button>
+          {form.errors.authorized && (
+            <p className="italic text-red-500">{form.errors.authorized}</p>
+          )}
         </form>
         {imageUrl && (
-          <img
-            src={`data:image/png;base64, ${imageUrl}`}
+          <Image
+            src={imageUrl}
             alt="Image of generated prompt"
             width={100}
             height={100}
