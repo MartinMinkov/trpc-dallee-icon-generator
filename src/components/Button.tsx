@@ -2,10 +2,10 @@ import clsx from "clsx";
 
 export function Button(
   props: React.ComponentPropsWithoutRef<"button"> & {
-    variant: "primary" | "secondary";
+    variant?: "primary" | "secondary";
   }
 ) {
-  let color: string;
+  let color = "primary";
   switch (props.variant) {
     case "primary":
       color = "bg-blue-400 hover:bg-blue-500";
