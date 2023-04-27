@@ -17,18 +17,20 @@ function HeroBanner() {
           Transform your creative process with instant, tailor-made icon
           solutions at your fingertips.
         </p>
-        <PrimaryLinkButton href="/generate" variant="primary">
-          Generate your icons
-        </PrimaryLinkButton>
+        <div className="mt-2 w-full">
+          <PrimaryLinkButton href="/generate" variant="primary">
+            Generate your icons
+          </PrimaryLinkButton>
+        </div>
       </div>
-      <div>
+      <>
         <Image
           src="/banner.png"
           alt="Image of a bunch of icons"
           width="400"
           height="400"
         ></Image>
-      </div>
+      </>
     </section>
   );
 }
