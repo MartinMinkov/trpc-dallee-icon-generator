@@ -20,7 +20,10 @@ export function Button(
   return (
     <button
       {...props}
-      className={clsx("rounded px-1 py-1 text-white sm:px-4 sm:py-2", color)}
+      className={clsx(
+        "rounded px-1 py-1 text-white disabled:bg-gray-500 sm:px-4 sm:py-2",
+        color
+      )}
     >
       {props.children}
     </button>

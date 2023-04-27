@@ -114,10 +114,7 @@ const GeneratePage: NextPage = () => {
               <p className="italic text-red-500">{form.errors.prompt}</p>
             )}
           </FormGroup>
-          <Button
-            variant="primary"
-            className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
-          >
+          <Button disabled={generateIcon.isLoading} variant="primary">
             Generate
           </Button>
           {form.errors.authorized && (
