@@ -115,8 +115,8 @@ const GeneratePage: NextPage = () => {
             )}
           </FormGroup>
           <Button
-            isLoading={generateIcon.isLoading}
-            disabled={generateIcon.isLoading}
+            isLoading={generateIcon.isLoading || false}
+            disabled={generateIcon.isLoading || false}
             variant="primary"
           >
             Generate
@@ -126,12 +126,39 @@ const GeneratePage: NextPage = () => {
           )}
         </form>
         {imageUrl && (
-          <Image
-            src={imageUrl}
-            alt="Image of generated prompt"
-            width={100}
-            height={100}
-          />
+          <>
+            <h2>Your Icons</h2>
+            <section className="grid grid-cols-4 gap-4">
+              <Image
+                src={imageUrl}
+                alt="Image of generated prompt"
+                width={100}
+                height={100}
+                className="w-full"
+              />
+              <Image
+                src={imageUrl}
+                alt="Image of generated prompt"
+                width={100}
+                height={100}
+                className="w-full"
+              />
+              <Image
+                src={imageUrl}
+                alt="Image of generated prompt"
+                width={100}
+                height={100}
+                className="w-full"
+              />
+              <Image
+                src={imageUrl}
+                alt="Image of generated prompt"
+                width={100}
+                height={100}
+                className="w-full"
+              />
+            </section>
+          </>
         )}
       </main>
     </>

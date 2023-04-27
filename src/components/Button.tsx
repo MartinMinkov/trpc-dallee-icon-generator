@@ -23,7 +23,7 @@ export function Button(
     <button
       {...props}
       className={clsx(
-        "flex items-center justify-center gap-2 px-1 py-1 text-white disabled:bg-gray-500 sm:px-4 sm:py-3",
+        "flex items-center justify-center gap-2 rounded px-1 py-1 text-white disabled:bg-gray-500 sm:px-4 sm:py-3",
         color
       )}
     >
