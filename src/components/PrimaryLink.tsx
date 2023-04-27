@@ -4,7 +4,7 @@ export function PrimaryLink(
   props: React.ComponentPropsWithoutRef<"a"> & LinkProps
 ) {
   return (
-    <Link {...props} className="hover:text-cyan-800">
+    <Link {...props} className="hover:text-cyan-600">
       {props.children}
     </Link>
   );
