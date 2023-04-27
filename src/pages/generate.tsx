@@ -32,10 +32,6 @@ const GeneratePage: NextPage = () => {
   });
   const [imageUrl, setImageUrl] = useState<string>("");
 
-  const session = useSession();
-  const isLoggedIn = session.status === "authenticated";
-  const { buyCredits } = useBuyCredits();
-
   const generateIcon = api.generate.generateIcon.useMutation({
     onSuccess: (data) => {
       setImageUrl(data.imageUrl);
@@ -94,38 +90,6 @@ const GeneratePage: NextPage = () => {
     };
   };
 
-  const renderAuthenticationButtons = () => {
-    return !isLoggedIn ? (
-      <Button
-        onClick={() => {
-          signIn().catch(console.error);
-        }}
-        className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
-      >
-        Login
-      </Button>
-    ) : (
-      <>
-        <Button
-          onClick={() => {
-            signOut().catch(console.error);
-          }}
-          className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
-        >
-          Logout
-        </Button>
-        <Button
-          onClick={() => {
-            buyCredits().catch(console.error);
-          }}
-          className="rounded bg-blue-400 px-4 py-4 text-white hover:bg-blue-500"
-        >
-          Buy Credits
-        </Button>
-      </>
-    );
-  };
-
   return (
     <>
       <Head>
@@ -134,7 +98,6 @@ const GeneratePage: NextPage = () => {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <main className="flex min-h-screen flex-col items-center justify-center">
-        {renderAuthenticationButtons()}
         <form className="flex flex-col gap-4" onSubmit={onSubmit}>
           <FormGroup>
             <label htmlFor="prompt">Prompt</label>
