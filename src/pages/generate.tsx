@@ -9,6 +9,7 @@ import { Input } from "~/components/Input";
 import { Button } from "~/components/Button";
 import { FormGroup } from "~/components/FormGroup";
 import { TRPCClientError } from "@trpc/client";
+import { Spinner } from "~/components/Spinner";
 
 const validationSchema = z.object({
   prompt: z.string().nonempty(),
@@ -88,6 +89,12 @@ const GeneratePage: NextPage = () => {
     };
   };
 
+  const renderSpinner = () => {
+    if (generateIcon.isLoading) {
+      return <Spinner />;
+    }
+  };
+
   return (
     <>
       <Head>
@@ -120,6 +127,7 @@ const GeneratePage: NextPage = () => {
           {form.errors.authorized && (
             <p className="italic text-red-500">{form.errors.authorized}</p>
           )}
+          {renderSpinner()}
         </form>
         {imageUrl && (
           <Image
