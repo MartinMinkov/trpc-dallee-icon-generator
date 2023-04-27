@@ -17,7 +17,7 @@ function HeroBanner() {
           Transform your creative process with instant, tailor-made icon
           solutions at your fingertips.
         </p>
-        <PrimaryLinkButton href="/generate" variant="primary" size="small">
+        <PrimaryLinkButton href="/generate" variant="primary">
           Generate your icons
         </PrimaryLinkButton>
       </div>

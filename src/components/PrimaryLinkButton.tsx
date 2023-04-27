@@ -6,7 +6,6 @@ export function PrimaryLinkButton(
   props: React.ComponentPropsWithoutRef<"a"> &
     LinkProps & {
       variant?: "primary" | "secondary";
-      size?: "small" | "medium" | "large";
     }
 ) {
   let color = "primary";
@@ -20,24 +19,11 @@ export function PrimaryLinkButton(
     default:
       throw new Error("Invalid variant");
   }
-  let size = "medium";
-  switch (props.size) {
-    case "small":
-      size = "w-1/4";
-      break;
-    case "medium":
-      size = "w-1/2";
-      break;
-    case "large":
-      size = "w-full";
-      break;
-    default:
-      throw new Error("Invalid size");
-  }
+
   return (
     <Link
       {...props}
-      className={clsx("rounded px-4 py-2 text-center text-white", color, size)}
+      className={clsx("rounded px-4 py-2 text-center text-white", color)}
     >
       {props.children}
     </Link>
