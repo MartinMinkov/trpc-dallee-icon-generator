@@ -1,3 +1,5 @@
+import clsx from "clsx";
+
 export function Button(
   props: React.ComponentPropsWithoutRef<"button"> & {
     variant: "primary" | "secondary";
@@ -16,7 +18,7 @@ export function Button(
   }
 
   return (
-    <button {...props} className={`rounded ${color} px-4 py-4 text-white `}>
+    <button {...props} className={clsx("rounded px-4 py-2 text-white", color)}>
       {props.children}
     </button>
   );
