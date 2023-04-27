@@ -1,12 +1,10 @@
 import { type NextPage } from "next";
 import { useState } from "react";
-import { signIn, signOut, useSession } from "next-auth/react";
 import Head from "next/head";
 import { z } from "zod";
 import Image from "next/image";
 
 import { api } from "~/utils/api";
-import { useBuyCredits } from "~/hooks/useBuyCredits";
 import { Input } from "~/components/Input";
 import { Button } from "~/components/Button";
 import { FormGroup } from "~/components/FormGroup";
