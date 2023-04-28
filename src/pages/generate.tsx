@@ -116,13 +116,10 @@ const GeneratePage: NextPage = () => {
           </FormGroup>
           <h2>2. Pick your icon color</h2>
           <FormGroup>
-            <label htmlFor="color">Color</label>
-            <Input
-              value={form.prompt}
-              id="color"
-              placeholder="Write your prompt here..."
-              onChange={updateForm("prompt")}
-            />
+            <label htmlFor="blue" className="flex gap-2 text-2xl">
+              <Input id="blue" name="blue" type="radio" />
+              Blue
+            </label>
             {form.errors.prompt && (
               <p className="italic text-red-500">{form.errors.prompt}</p>
             )}
