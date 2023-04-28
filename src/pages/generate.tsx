@@ -90,8 +90,6 @@ const GeneratePage: NextPage = () => {
     try {
       const data = validationSchema.parse(form);
       generateIcon.mutate(data);
-      setImageUrl("");
-      setForm({ prompt: "", color: "", errors: {} });
     } catch (error) {
       handleFormErrors(error);
     }
