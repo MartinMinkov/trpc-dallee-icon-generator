@@ -8,6 +8,7 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { env } from "~/env.mjs";
 import { imageMockUrl } from "~/data/imageMock";
 import { type PrismaClient } from "@prisma/client";
+import { KeyObject } from "crypto";
 
 type GenerateIconResponse = {
   b64_json: string;
@@ -29,8 +30,9 @@ const s3 = new AWS.S3({
   region: env.AWS_REGION,
 });
 
-function generatePrompt(prompt: string, color: string) {
-  return `This is an icon of a ${color} ${prompt}.\n\nIcon:`;
+function generatePrompt(input: GenerateInput) {
+  const { prompt, color } = input;
+  return `A modern icon in ${color} of a ${prompt}`;
 }
 
 async function generateIcon(prompt: string) {
@@ -94,9 +96,16 @@ function generateIconUrl(iconId: string) {
   return `https://${env.AWS_BUCKET_NAME}.s3.${env.AWS_REGION}.amazonaws.com/${iconId}`;
 }
 
+const inputSchema = z.object({
+  prompt: z.string(),
+  color: z.string(),
+});
+
+type GenerateInput = z.infer<typeof inputSchema>;
+
 export const generateRouter = createTRPCRouter({
   generateIcon: protectedProcedure
-    .input(z.object({ prompt: z.string(), color: z.string() }))
+    .input(inputSchema)
     .mutation(async ({ ctx, input }) => {
       // Return mock response if in development
       if (env.MOCK_DALLEE) {
@@ -123,7 +132,7 @@ export const generateRouter = createTRPCRouter({
         });
       }
 
-      const prompt = generatePrompt(input.prompt, input.color);
+      const prompt = generatePrompt(input);
       const base64EncodedImage = await generateIcon(prompt);
 
       const iconId = nanoid();
