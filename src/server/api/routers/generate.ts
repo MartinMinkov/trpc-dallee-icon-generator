@@ -84,7 +84,7 @@ async function uploadIconToS3(
 }
 
 function generateIconUrl(iconId: string) {
-  return `https://${env.S3_AWS_BUCKET_NAME}.s3.${env.AWS_REGION}.amazonaws.com/${iconId}`;
+  return `https://${env.S3_AWS_BUCKET_NAME}.s3.${env.S3_AWS_REGION}.amazonaws.com/${iconId}`;
 }
 
 const inputSchema = z.object({
