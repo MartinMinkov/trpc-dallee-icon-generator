@@ -24,7 +24,7 @@ const validationSchema = z.object({
 type ValidationSchema = z.infer<typeof validationSchema>;
 
 function findError<T extends string | number>(errors: T[], error: string) {
-  return errors.find((err) => err === error) !== -1;
+  return errors.find((err) => err === error);
 }
 
 const GeneratePage: NextPage = () => {
