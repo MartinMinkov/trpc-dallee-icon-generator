@@ -30,7 +30,7 @@ function findError<T extends string | number>(errors: T[], error: string) {
 const GeneratePage: NextPage = () => {
   const [form, setForm] = useState<ValidationSchema>({
     prompt: "",
-    color: "",
+    color: "#808080",
     errors: {
       prompt: undefined,
       color: undefined,
