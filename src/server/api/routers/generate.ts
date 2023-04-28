@@ -9,14 +9,6 @@ import { env } from "~/env.mjs";
 import { imageMockUrl } from "~/data/imageMock";
 import { type PrismaClient } from "@prisma/client";
 
-type GenerateIconResponse = {
-  b64_json: string;
-};
-
-type GenerateResponse = {
-  imageUrl: string;
-};
-
 const configuration = new Configuration({
   apiKey: env.DALLEE_API_KEY,
 });
@@ -100,6 +92,12 @@ const inputSchema = z.object({
   color: z.string(),
 });
 
+type GenerateIconResponse = {
+  b64_json: string;
+};
+type GenerateResponse = {
+  imageUrl: string;
+};
 type GenerateInput = z.infer<typeof inputSchema>;
 
 export const generateRouter = createTRPCRouter({
@@ -108,7 +106,7 @@ export const generateRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // Return mock response if in development
       if (env.MOCK_DALLEE) {
-        return { imageUrl: imageMockUrl } as GenerateResponse;
+        return { imageUrl: imageMockUrl } satisfies GenerateResponse;
       }
 
       const { count } = await ctx.prisma.user.updateMany({
@@ -139,6 +137,6 @@ export const generateRouter = createTRPCRouter({
 
       await saveIconToDatabase({ prompt, imageUrl }, ctx);
       await uploadIconToS3(base64EncodedImage, iconId);
-      return { imageUrl } as GenerateResponse;
+      return { imageUrl } satisfies GenerateResponse;
     }),
 });
