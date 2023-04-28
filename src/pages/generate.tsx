@@ -30,7 +30,7 @@ const GeneratePage: NextPage = () => {
     },
   });
   const [imageUrl, setImageUrl] = useState<string>("");
-  const [color, setColor] = useState("#aabbcc");
+  const [color, setColor] = useState("#A020F0");
 
   const generateIcon = api.generate.generateIcon.useMutation({
     onSuccess: (data) => {
@@ -118,7 +118,7 @@ const GeneratePage: NextPage = () => {
           </FormGroup>
           <h2>2. Pick your icon color</h2>
           <FormGroup>
-            <div className="flex items-center gap-6">
+            <div className="flex flex-col items-center gap-6 sm:flex-row">
               <HexColorPicker color={color} onChange={setColor} />
               <div
                 className="h-48 w-48 rounded"
