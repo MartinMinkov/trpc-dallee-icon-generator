@@ -29,6 +29,10 @@ const s3 = new AWS.S3({
   region: env.AWS_REGION,
 });
 
+function generatePrompt(prompt: string, color: string) {
+  return `This is an icon of a ${color} ${prompt}.\n\nIcon:`;
+}
+
 async function generateIcon(prompt: string) {
   const openai = new OpenAIApi(configuration);
   let errorMessage: string | null = null;
@@ -92,7 +96,7 @@ function generateIconUrl(iconId: string) {
 
 export const generateRouter = createTRPCRouter({
   generateIcon: protectedProcedure
-    .input(z.object({ prompt: z.string() }))
+    .input(z.object({ prompt: z.string(), color: z.string() }))
     .mutation(async ({ ctx, input }) => {
       // Return mock response if in development
       if (env.MOCK_DALLEE) {
@@ -119,10 +123,13 @@ export const generateRouter = createTRPCRouter({
         });
       }
 
+      const prompt = generatePrompt(input.prompt, input.color);
+      const base64EncodedImage = await generateIcon(prompt);
+
       const iconId = nanoid();
-      const base64EncodedImage = await generateIcon(input.prompt);
       const imageUrl = generateIconUrl(iconId);
-      await saveIconToDatabase({ prompt: input.prompt, imageUrl }, ctx);
+
+      await saveIconToDatabase({ prompt, imageUrl }, ctx);
       await uploadIconToS3(base64EncodedImage, iconId);
       return { imageUrl } as GenerateResponse;
     }),
