@@ -3,6 +3,7 @@ import { useState } from "react";
 import Head from "next/head";
 import { z } from "zod";
 import Image from "next/image";
+import { HexColorInput, HexColorPicker } from "react-colorful";
 
 import { api } from "~/utils/api";
 import { Input } from "~/components/Input";
@@ -29,6 +30,7 @@ const GeneratePage: NextPage = () => {
     },
   });
   const [imageUrl, setImageUrl] = useState<string>("");
+  const [color, setColor] = useState("#aabbcc");
 
   const generateIcon = api.generate.generateIcon.useMutation({
     onSuccess: (data) => {
@@ -116,13 +118,18 @@ const GeneratePage: NextPage = () => {
           </FormGroup>
           <h2>2. Pick your icon color</h2>
           <FormGroup>
-            <label htmlFor="blue" className="flex gap-2 text-2xl">
-              <Input id="blue" name="blue" type="radio" />
-              Blue
-            </label>
-            {form.errors.prompt && (
-              <p className="italic text-red-500">{form.errors.prompt}</p>
-            )}
+            <div className="flex items-center gap-6">
+              <HexColorPicker color={color} onChange={setColor} />
+              <div
+                className="h-48 w-48 rounded"
+                style={{ backgroundColor: color }}
+              />
+            </div>
+            <HexColorInput
+              className="w-1/6 uppercase"
+              color={color}
+              onChange={setColor}
+            />
           </FormGroup>
           <Button
             isLoading={generateIcon.isLoading || false}
