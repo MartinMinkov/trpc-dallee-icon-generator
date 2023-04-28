@@ -143,7 +143,7 @@ const GeneratePage: NextPage = () => {
               />
               <div
                 className="h-48 w-48 rounded"
-                style={{ backgroundColor: form.color }}
+                style={{ backgroundColor: form.color ?? "transparent" }}
               />
             </div>
             <HexColorInput
