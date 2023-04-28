@@ -82,7 +82,7 @@ async function uploadIconToS3(
 ) {
   await s3
     .putObject({
-      Bucket: env.AWS_BUCKET_NAME,
+      Bucket: env.S3_AWS_BUCKET_NAME,
       Key: iconId,
       Body: Buffer.from(base64EncodedImage.b64_json, "base64"),
       ContentEncoding: "base64",
@@ -92,7 +92,7 @@ async function uploadIconToS3(
 }
 
 function generateIconUrl(iconId: string) {
-  return `https://${env.AWS_BUCKET_NAME}.s3.${env.AWS_REGION}.amazonaws.com/${iconId}`;
+  return `https://${env.S3_AWS_BUCKET_NAME}.s3.${env.AWS_REGION}.amazonaws.com/${iconId}`;
 }
 
 const inputSchema = z.object({
