@@ -4,7 +4,7 @@ import { Spinner } from "./Spinner";
 export function Button(
   props: React.ComponentPropsWithoutRef<"button"> & {
     variant?: "primary" | "secondary";
-    isLoading: boolean;
+    isLoading?: boolean;
   }
 ) {
   let color = "primary";
