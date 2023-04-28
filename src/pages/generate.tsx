@@ -165,7 +165,7 @@ const GeneratePage: NextPage = () => {
         </form>
         {imageUrl && (
           <>
-            <h2>Your Icons</h2>
+            <h2 className="my-12 text-2xl">Your Icons</h2>
             <section className="grid grid-cols-4 gap-4">
               <Image
                 src={imageUrl}
