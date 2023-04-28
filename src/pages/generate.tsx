@@ -13,24 +13,31 @@ import { TRPCClientError } from "@trpc/client";
 
 const validationSchema = z.object({
   prompt: z.string().nonempty(),
+  color: z.string().nonempty(),
   errors: z.object({
     prompt: z.string().optional(),
+    color: z.string().optional(),
     authorized: z.string().optional(),
   }),
 });
 
 type ValidationSchema = z.infer<typeof validationSchema>;
 
+function findError<T extends string | number>(errors: T[], error: string) {
+  return errors.find((err) => err === error) !== -1;
+}
+
 const GeneratePage: NextPage = () => {
   const [form, setForm] = useState<ValidationSchema>({
     prompt: "",
+    color: "",
     errors: {
       prompt: undefined,
+      color: undefined,
       authorized: undefined,
     },
   });
   const [imageUrl, setImageUrl] = useState<string>("");
-  const [color, setColor] = useState("#A020F0");
 
   const generateIcon = api.generate.generateIcon.useMutation({
     onSuccess: (data) => {
@@ -55,12 +62,22 @@ const GeneratePage: NextPage = () => {
     if (error instanceof z.ZodError) {
       for (const issue of error.issues) {
         const { path } = issue;
+        console.log(path);
         if (path.length === 0) continue;
-        if (path[0] === "prompt") {
+        if (findError(path, "prompt")) {
           setForm((currentState) => {
             const newErrors = {
               ...currentState.errors,
               prompt: "Prompt is required",
+            };
+            return { ...currentState, errors: newErrors };
+          });
+        }
+        if (findError(path, "color")) {
+          setForm((currentState) => {
+            const newErrors = {
+              ...currentState.errors,
+              color: "Color is required",
             };
             return { ...currentState, errors: newErrors };
           });
@@ -75,16 +92,17 @@ const GeneratePage: NextPage = () => {
       const data = validationSchema.parse(form);
       generateIcon.mutate(data);
       setImageUrl("");
-      setForm({ prompt: "", errors: {} });
+      setForm({ prompt: "", color: "", errors: {} });
     } catch (error) {
       handleFormErrors(error);
     }
   };
 
   const updateForm = (key: string) => {
-    return function (e: React.ChangeEvent<HTMLInputElement>) {
+    return function (e: React.ChangeEvent<HTMLInputElement> | string) {
       const errors = { ...form.errors, [key]: undefined };
       setForm((prev) => {
+        if (typeof e === "string") return { ...prev, errors, [key]: e };
         return { ...prev, errors, [key]: e.target.value };
       });
     };
@@ -119,18 +137,24 @@ const GeneratePage: NextPage = () => {
           <h2>2. Pick your icon color</h2>
           <FormGroup>
             <div className="flex flex-col items-center gap-6 sm:flex-row">
-              <HexColorPicker color={color} onChange={setColor} />
+              <HexColorPicker
+                color={form.color}
+                onChange={updateForm("color")}
+              />
               <div
                 className="h-48 w-48 rounded"
-                style={{ backgroundColor: color }}
+                style={{ backgroundColor: form.color }}
               />
             </div>
             <HexColorInput
               className="w-1/6 uppercase"
-              color={color}
-              onChange={setColor}
+              color={form.color}
+              onChange={updateForm("color")}
             />
           </FormGroup>
+          {form.errors.color && (
+            <p className="italic text-red-500">{form.errors.color}</p>
+          )}
           <Button
             isLoading={generateIcon.isLoading || false}
             disabled={generateIcon.isLoading || false}
