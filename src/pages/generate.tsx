@@ -62,7 +62,6 @@ const GeneratePage: NextPage = () => {
     if (error instanceof z.ZodError) {
       for (const issue of error.issues) {
         const { path } = issue;
-        console.log(path);
         if (path.length === 0) continue;
         if (findError(path, "prompt")) {
           setForm((currentState) => {
