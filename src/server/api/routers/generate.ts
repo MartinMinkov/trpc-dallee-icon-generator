@@ -8,7 +8,6 @@ import { createTRPCRouter, protectedProcedure } from "~/server/api/trpc";
 import { env } from "~/env.mjs";
 import { imageMockUrl } from "~/data/imageMock";
 import { type PrismaClient } from "@prisma/client";
-import { KeyObject } from "crypto";
 
 type GenerateIconResponse = {
   b64_json: string;
