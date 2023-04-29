@@ -23,10 +23,8 @@ const server = z.object({
   GOOGLE_CLIENT_ID: z.string(),
   GOOGLE_CLIENT_SECRET: z.string(),
   DALLEE_API_KEY: z.string().min(1),
-  MOCK_DALLEE: z
-    .string()
-    .min(1)
-    .transform((val) => val === "true"),
+  MOCK_DALLEE:
+    process.env.MOCK_DALLEE === "true" ? z.literal("true") : z.literal("false"),
   S3_AWS_ACCESS_KEY_ID: z.string().min(1),
   S3_AWS_SECRET_ACCESS_KEY: z.string().min(1),
   S3_AWS_REGION: z.string().min(1),
