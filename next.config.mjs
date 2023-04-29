@@ -8,7 +8,10 @@ await import("./src/env.mjs");
 const config = {
   reactStrictMode: true,
   images: {
-    domains: ["icon-generator-trpc.s3.us-west-1.amazonaws.com"],
+    domains: [
+      "icon-generator-trpc.s3.us-west-1.amazonaws.com",
+      "icons.mminkov.dev",
+    ],
   },
 
   /**
