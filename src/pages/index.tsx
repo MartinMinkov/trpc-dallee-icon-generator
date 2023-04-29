@@ -24,12 +24,12 @@ function HeroBanner() {
         </div>
       </div>
       <div className="order-first md:order-none">
-        <Image
+        <img
           src="/banner.png"
           alt="Image of a bunch of icons"
           width="400"
           height="400"
-        ></Image>
+        />
       </div>
     </section>
   );
