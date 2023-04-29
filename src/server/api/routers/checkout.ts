@@ -10,8 +10,8 @@ const stripe = new Stripe(env.STRIPE_SECRET_KEY, {
 export const checkoutRouter = createTRPCRouter({
   createCheckout: protectedProcedure.mutation(async ({ ctx }) => {
     return stripe.checkout.sessions.create({
-      success_url: env.HOSTNAME,
-      cancel_url: env.HOSTNAME,
+      success_url: env.HOST_NAME,
+      cancel_url: env.HOST_NAME,
       line_items: [{ price: env.PRICE_ID, quantity: 1 }],
       mode: "payment",
       metadata: {
