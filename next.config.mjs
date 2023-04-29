@@ -11,6 +11,7 @@ const config = {
     domains: [
       "icon-generator-trpc.s3.us-west-1.amazonaws.com",
       "icons.mminkov.dev",
+      "mminkov.dev",
     ],
   },
 
