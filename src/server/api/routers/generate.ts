@@ -105,7 +105,7 @@ export const generateRouter = createTRPCRouter({
     .input(inputSchema)
     .mutation(async ({ ctx, input }) => {
       // Return mock response if in development
-      if (env.MOCK_DALLEE) {
+      if (env.MOCK_DALLEE === "true") {
         return { imageUrl: imageMockUrl } satisfies GenerateResponse;
       }
 
