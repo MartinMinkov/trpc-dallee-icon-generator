@@ -100,7 +100,7 @@ type GenerateResponse = {
 };
 type GenerateInput = z.infer<typeof inputSchema>;
 
-export const generateRouter = createTRPCRouter({
+export const iconRouter = createTRPCRouter({
   generateIcon: protectedProcedure
     .input(inputSchema)
     .mutation(async ({ ctx, input }) => {

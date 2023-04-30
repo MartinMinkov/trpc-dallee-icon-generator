@@ -38,7 +38,7 @@ const GeneratePage: NextPage = () => {
   });
   const [imageUrl, setImageUrl] = useState<string>("");
 
-  const generateIcon = api.generate.generateIcon.useMutation({
+  const generateIcon = api.icon.generateIcon.useMutation({
     onSuccess: (data) => {
       setImageUrl(data.imageUrl);
     },
