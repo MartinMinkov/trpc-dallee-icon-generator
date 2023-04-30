@@ -139,4 +139,13 @@ export const generateRouter = createTRPCRouter({
       await uploadIconToS3(base64EncodedImage, iconId);
       return { imageUrl } satisfies GenerateResponse;
     }),
+
+  getUserIcons: protectedProcedure.query(async ({ ctx }) => {
+    const icons = await ctx.prisma.icon.findMany({
+      where: {
+        userId: ctx.session.user.id,
+      },
+    });
+    return icons;
+  }),
 });

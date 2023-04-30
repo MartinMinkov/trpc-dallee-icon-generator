@@ -54,7 +54,7 @@ export function Header() {
             </li>
             {isLoggedIn && (
               <li>
-                <PrimaryLink href="/collections">Collections</PrimaryLink>
+                <PrimaryLink href="/collection">Collections</PrimaryLink>
               </li>
             )}
           </ul>
