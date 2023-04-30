@@ -26,7 +26,7 @@ const CollectionPage: NextPage = () => {
         <meta name="description" content="Your Icons" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <main className="container mx-auto mt-12 min-h-screen sm:mt-24">
+      <main className="container mx-auto mt-12 flex min-h-screen items-start justify-center gap-8 sm:mt-24">
         {renderIcons()}
       </main>
     </>
