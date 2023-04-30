@@ -28,7 +28,7 @@ const CollectionPage: NextPage = () => {
       </Head>
       <main className="container mx-auto mt-12 min-h-screen sm:mt-24">
         <h1 className="text-3xl">Your Generated Icons</h1>
-        <div className="mt-12 flex items-start justify-center gap-12">
+        <div className="mt-12 grid grid-cols-2 gap-12 sm:grid-cols-4 md:grid-cols-6">
           {renderIcons()}
         </div>
       </main>
