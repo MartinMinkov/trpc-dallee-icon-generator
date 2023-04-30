@@ -12,7 +12,7 @@ const CollectionPage: NextPage = () => {
           key={icon.id}
           className="flex flex-col items-center justify-center"
         >
-          <img src={icon.url} alt="icon" />
+          <img src={icon.url} alt="icon" width={200} height={200} />
           <p>{icon.prompt}</p>
         </div>
       );
