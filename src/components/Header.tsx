@@ -47,11 +47,16 @@ export function Header() {
     <header className=" bg-gray-800 px-4 sm:px-0">
       <div className="container mx-auto flex h-16 items-center justify-between text-white">
         <PrimaryLink href="/">Icon Generator</PrimaryLink>
-        <div className="justify-cente flex items-center gap-8">
-          <ul>
+        <div className="flex items-center justify-center gap-8">
+          <ul className="flex gap-6">
             <li>
               <PrimaryLink href="/generate">Generate</PrimaryLink>
             </li>
+            {isLoggedIn && (
+              <li>
+                <PrimaryLink href="/collections">Collections</PrimaryLink>
+              </li>
+            )}
           </ul>
           <div>{renderAuthenticationButtons()}</div>
         </div>
