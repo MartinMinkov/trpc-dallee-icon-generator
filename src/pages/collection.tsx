@@ -5,8 +5,6 @@ import { api } from "~/utils/api";
 const CollectionPage: NextPage = () => {
   const getUserIcons = api.generate.getUserIcons.useQuery();
 
-  console.log(getUserIcons.data);
-
   const renderIcons = () => {
     return getUserIcons.data?.map((icon) => {
       return (
