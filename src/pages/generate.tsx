@@ -2,7 +2,6 @@ import { type NextPage } from "next";
 import { useState } from "react";
 import Head from "next/head";
 import { z } from "zod";
-import Image from "next/image";
 import { HexColorInput, HexColorPicker } from "react-colorful";
 
 import { api } from "~/utils/api";
