@@ -173,27 +173,6 @@ const GeneratePage: NextPage = () => {
                 height={100}
                 className="w-full"
               />
-              <img
-                src={imageUrl}
-                alt="Image of generated prompt"
-                width={100}
-                height={100}
-                className="w-full"
-              />
-              <img
-                src={imageUrl}
-                alt="Image of generated prompt"
-                width={100}
-                height={100}
-                className="w-full"
-              />
-              <img
-                src={imageUrl}
-                alt="Image of generated prompt"
-                width={100}
-                height={100}
-                className="w-full"
-              />
             </section>
           </>
         )}
