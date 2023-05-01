@@ -1,9 +1,13 @@
 import { useSession, signIn, signOut } from "next-auth/react";
+import { api } from "~/utils/api";
+
 import { useBuyCredits } from "~/hooks/useBuyCredits";
 import { PrimaryLink } from "./PrimaryLink";
 import { Button } from "./Button";
 
 export function Header() {
+  const getUserCredits = api.user.getCredits.useQuery();
+
   const session = useSession();
   const isLoggedIn = session.status === "authenticated";
 
@@ -56,9 +60,12 @@ export function Header() {
               <PrimaryLink href="/community">Community</PrimaryLink>
             </li>
             {isLoggedIn && (
-              <li>
-                <PrimaryLink href="/collection">Collections</PrimaryLink>
-              </li>
+              <>
+                <li>
+                  <PrimaryLink href="/collection">Collections</PrimaryLink>
+                </li>
+                <li>{getUserCredits.data} Credits</li>
+              </>
             )}
           </ul>
           <div>{renderAuthenticationButtons()}</div>
