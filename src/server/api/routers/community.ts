@@ -12,6 +12,9 @@ export const communityRouter = createTRPCRouter({
         id: true,
         url: true,
       },
+      orderBy: {
+        createdAt: "desc",
+      },
     });
     return icons;
   }),
