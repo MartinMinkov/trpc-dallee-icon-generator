@@ -13,9 +13,11 @@ import { TRPCClientError } from "@trpc/client";
 const validationSchema = z.object({
   prompt: z.string().nonempty(),
   color: z.string().nonempty(),
+  numberOfIcons: z.number().int().positive().default(1),
   errors: z.object({
     prompt: z.string().optional(),
     color: z.string().optional(),
+    numberOfIcons: z.string().optional(),
     authorized: z.string().optional(),
   }),
 });
@@ -30,9 +32,11 @@ const GeneratePage: NextPage = () => {
   const [form, setForm] = useState<ValidationSchema>({
     prompt: "",
     color: "#808080",
+    numberOfIcons: 1,
     errors: {
       prompt: undefined,
       color: undefined,
+      numberOfIcons: undefined,
       authorized: undefined,
     },
   });
@@ -76,6 +80,15 @@ const GeneratePage: NextPage = () => {
             const newErrors = {
               ...currentState.errors,
               color: "Color is required",
+            };
+            return { ...currentState, errors: newErrors };
+          });
+        }
+        if (findError(path, "numberOfIcons")) {
+          setForm((currentState) => {
+            const newErrors = {
+              ...currentState.errors,
+              color: "Number of icons is required",
             };
             return { ...currentState, errors: newErrors };
           });
@@ -131,7 +144,7 @@ const GeneratePage: NextPage = () => {
             )}
           </FormGroup>
           <h2>2. Pick your icon color</h2>
-          <FormGroup>
+          <FormGroup className="mb-12">
             <div className="flex flex-col items-center gap-6 sm:flex-row">
               <HexColorPicker
                 color={form.color}
@@ -151,6 +164,19 @@ const GeneratePage: NextPage = () => {
           {form.errors.color && (
             <p className="italic text-red-500">{form.errors.color}</p>
           )}
+          <h2>3. Pick how many icons you want to generate</h2>
+          <FormGroup>
+            <label htmlFor="numberOfIcons">Number of icons to generate</label>
+            <Input
+              value={form.numberOfIcons}
+              id="numberOfIcons"
+              placeholder="Number of icons..."
+              onChange={updateForm("numberofIcons")}
+            />
+            {form.errors.numberOfIcons && (
+              <p className="italic text-red-500">{form.errors.numberOfIcons}</p>
+            )}
+          </FormGroup>
           <Button
             isLoading={generateIcon.isLoading || false}
             disabled={generateIcon.isLoading || false}
