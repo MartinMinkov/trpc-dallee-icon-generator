@@ -149,13 +149,4 @@ export const iconRouter = createTRPCRouter({
       }
       return icons satisfies GenerateResponse;
     }),
-
-  getUserIcons: protectedProcedure.query(async ({ ctx }) => {
-    const icons = await ctx.prisma.icon.findMany({
-      where: {
-        userId: ctx.session.user.id,
-      },
-    });
-    return icons;
-  }),
 });

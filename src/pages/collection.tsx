@@ -3,7 +3,7 @@ import Head from "next/head";
 import { api } from "~/utils/api";
 
 const CollectionPage: NextPage = () => {
-  const getUserIcons = api.icon.getUserIcons.useQuery();
+  const getUserIcons = api.user.getUserIcons.useQuery();
 
   const renderIcons = () => {
     return getUserIcons.data?.map((icon) => {
