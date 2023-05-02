@@ -26,21 +26,19 @@ function generatePrompt(input: GenerateInput) {
   return `A modern icon in ${color} of a ${prompt}`;
 }
 
-async function generateIcon(prompt: string) {
+async function generateIcon(prompt: string, numberOfIcons: number) {
   const openai = new OpenAIApi(configuration);
   let errorMessage: string | null = null;
 
   try {
     const response = await openai.createImage({
       prompt,
-      n: 1,
+      n: numberOfIcons,
       size: "256x256",
       response_format: "b64_json",
     });
     if (response.data.data[0]?.b64_json) {
-      return {
-        b64_json: response.data.data[0].b64_json,
-      } as GenerateIconResponse;
+      return response.data.data.map((result) => result.b64_json);
     } else {
       errorMessage = "Something went wrong";
     }
@@ -68,15 +66,12 @@ async function saveIconToDatabase(
   });
 }
 
-async function uploadIconToS3(
-  base64EncodedImage: GenerateIconResponse,
-  iconId: string
-) {
+async function uploadIconToS3(base64EncodedImage: string, iconId: string) {
   await s3
     .putObject({
       Bucket: env.S3_AWS_BUCKET_NAME,
       Key: iconId,
-      Body: Buffer.from(base64EncodedImage.b64_json, "base64"),
+      Body: Buffer.from(base64EncodedImage, "base64"),
       ContentEncoding: "base64",
       ContentType: "image/gif",
     })
@@ -90,14 +85,12 @@ function generateIconUrl(iconId: string) {
 const inputSchema = z.object({
   prompt: z.string(),
   color: z.string(),
+  numberOfIcons: z.number(),
 });
 
-type GenerateIconResponse = {
-  b64_json: string;
-};
 type GenerateResponse = {
   imageUrl: string;
-};
+}[];
 type GenerateInput = z.infer<typeof inputSchema>;
 
 export const iconRouter = createTRPCRouter({
@@ -106,19 +99,23 @@ export const iconRouter = createTRPCRouter({
     .mutation(async ({ ctx, input }) => {
       // Return mock response if in development
       if (env.MOCK_DALLEE === "true") {
-        return { imageUrl: imageMockUrl } satisfies GenerateResponse;
+        return [
+          {
+            imageUrl: imageMockUrl,
+          },
+        ] satisfies GenerateResponse;
       }
 
       const { count } = await ctx.prisma.user.updateMany({
         where: {
           id: ctx.session.user.id,
           credits: {
-            gte: 1,
+            gte: 1 * input.numberOfIcons,
           },
         },
         data: {
           credits: {
-            decrement: 1,
+            decrement: 1 * input.numberOfIcons,
           },
         },
       });
@@ -130,14 +127,27 @@ export const iconRouter = createTRPCRouter({
       }
 
       const prompt = generatePrompt(input);
-      const base64EncodedImage = await generateIcon(prompt);
+      const base64EncodedImages = await generateIcon(
+        prompt,
+        input.numberOfIcons
+      );
 
-      const iconId = nanoid();
-      const imageUrl = generateIconUrl(iconId);
+      const icons: GenerateResponse = [];
+      for (const base64EncodedImage of base64EncodedImages) {
+        if (base64EncodedImage === undefined) {
+          throw new TRPCError({
+            code: "BAD_REQUEST",
+            message: "Something went wrong",
+          });
+        }
+        const iconId = nanoid();
+        const imageUrl = generateIconUrl(iconId);
 
-      await saveIconToDatabase({ prompt, imageUrl }, ctx);
-      await uploadIconToS3(base64EncodedImage, iconId);
-      return { imageUrl } satisfies GenerateResponse;
+        await saveIconToDatabase({ prompt, imageUrl }, ctx);
+        await uploadIconToS3(base64EncodedImage, iconId);
+        icons.push({ imageUrl });
+      }
+      return icons satisfies GenerateResponse;
     }),
 
   getUserIcons: protectedProcedure.query(async ({ ctx }) => {

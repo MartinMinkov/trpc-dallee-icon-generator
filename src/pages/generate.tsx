@@ -40,11 +40,12 @@ const GeneratePage: NextPage = () => {
       authorized: undefined,
     },
   });
-  const [imageUrl, setImageUrl] = useState<string>("");
+  const [imageUrls, setImageUrls] = useState<string[]>([]);
 
   const generateIcon = api.icon.generateIcon.useMutation({
     onSuccess: (data) => {
-      setImageUrl(data.imageUrl);
+      console.log("DEBUG", data);
+      setImageUrls(data.map((icon) => icon.imageUrl));
     },
     onError: (error) => {
       if (error instanceof TRPCClientError) {
@@ -60,6 +61,26 @@ const GeneratePage: NextPage = () => {
       }
     },
   });
+
+  const renderIcons = () => {
+    if (imageUrls.length === 0) return null;
+    return (
+      <div className="mt-6 flex flex-col gap-4">
+        <h2 className="text-2xl">Generated Icons:</h2>
+        <div className="grid grid-cols-2 gap-4 sm:grid-cols-4 md:grid-cols-6">
+          {imageUrls.map((url) => (
+            <img
+              key={url}
+              src={url}
+              alt="Image of generated prompt"
+              width={200}
+              height={200}
+            />
+          ))}
+        </div>
+      </div>
+    );
+  };
 
   const handleFormErrors = (error: unknown) => {
     if (error instanceof z.ZodError) {
@@ -88,7 +109,7 @@ const GeneratePage: NextPage = () => {
           setForm((currentState) => {
             const newErrors = {
               ...currentState.errors,
-              color: "Number of icons is required",
+              numberOfIcons: "Number of icons is required",
             };
             return { ...currentState, errors: newErrors };
           });
@@ -99,6 +120,16 @@ const GeneratePage: NextPage = () => {
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    setForm((currentState) => {
+      const newErrors = {
+        ...currentState.errors,
+        prompt: undefined,
+        color: undefined,
+        numberOfIcons: undefined,
+        authorized: undefined,
+      };
+      return { ...currentState, errors: newErrors };
+    });
     try {
       const data = validationSchema.parse(form);
       generateIcon.mutate(data);
@@ -112,6 +143,8 @@ const GeneratePage: NextPage = () => {
       const errors = { ...form.errors, [key]: undefined };
       setForm((prev) => {
         if (typeof e === "string") return { ...prev, errors, [key]: e };
+        if (key === "numberOfIcons")
+          return { ...prev, errors, [key]: parseInt(e.target.value) };
         return { ...prev, errors, [key]: e.target.value };
       });
     };
@@ -168,10 +201,12 @@ const GeneratePage: NextPage = () => {
           <FormGroup>
             <label htmlFor="numberOfIcons">Number of icons to generate</label>
             <Input
+              inputMode="numeric"
+              type="number"
+              pattern="[1-9]|10"
               value={form.numberOfIcons}
               id="numberOfIcons"
-              placeholder="Number of icons..."
-              onChange={updateForm("numberofIcons")}
+              onChange={updateForm("numberOfIcons")}
             />
             {form.errors.numberOfIcons && (
               <p className="italic text-red-500">{form.errors.numberOfIcons}</p>
@@ -188,20 +223,7 @@ const GeneratePage: NextPage = () => {
             <p className="italic text-red-500">{form.errors.authorized}</p>
           )}
         </form>
-        {imageUrl && (
-          <>
-            <h2 className="my-12 text-2xl">Your Icons</h2>
-            <section className="grid grid-cols-4 gap-4">
-              <img
-                src={imageUrl}
-                alt="Image of generated prompt"
-                width={100}
-                height={100}
-                className="w-full"
-              />
-            </section>
-          </>
-        )}
+        {renderIcons()}
       </main>
     </>
   );
